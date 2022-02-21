@@ -30,6 +30,12 @@ game.Players.PlayerRemoving:Connect(function(Player:Player)
 	end
 end)
 
+game:BindToClose(function()
+	for _,v in pairs(Vault.Player._Cache) do
+		v:Save ()
+	end
+end)
+
 Event.new("LocalVault"):SetCallback(function(Player:Player,Key:string)
 	return Vault.Player.new (Player):Get (Key)
 end)
