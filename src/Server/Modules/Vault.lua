@@ -3,6 +3,7 @@ local DataStoreService = game:GetService("DataStoreService")
 local Event = require(script.Parent.ServerNet)
 
 local Task = require(game.ReplicatedStorage.Utility.TaskScheduler)
+local Signal = require(game.ReplicatedStorage.Utility.Signal)
 
 local PlayerDataStore: DataStore
 local GlobalDataStore: DataStore
@@ -45,6 +46,7 @@ function Vault.Player.new (Player:Player|number): VaultPlayer
 
 	self._Temp = {}
 	self.UserId = Player
+	self.KeySignals = {}
 
 	local Success,Value = pcall(PlayerDataStore.GetAsync,PlayerDataStore,Player)
 	local RetryNum = 0
@@ -82,6 +84,7 @@ function Vault.Player:Get (Key:string,DefaultValue:any?): any
 end
 
 function Vault.Player:Set (Key:string,Value:any)
+	if self.KeySignals[Key] then self.KeySignals[Key]:Fire (Value) end
 	self._Data[Key] = Value
 end
 
@@ -109,6 +112,12 @@ end
 
 function Vault.Player:ClearTemp ()
 	self._Temp = {}
+end
+
+function Vault.Player:GetKeyChangedSignal (Key:string): Signal
+	if self.KeySignals[Key] then return self.KeySignals[Key] end
+	self.KeySignals[Key] = Signal.new()
+	return self.KeySignals[Key]
 end
 
 Vault.Firebase = {}
