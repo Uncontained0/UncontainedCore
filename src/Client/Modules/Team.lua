@@ -12,6 +12,9 @@ function Team.new (Name:string)
 
 	self._Object = TeamFolder[Name]
 
+	self.Color = self._Object.Properties.Color.Value
+	self.LayoutOrder = self._Object.Properties.LayoutOrder.Value
+
 	self.PlayerAdded = Signal.new ()
 	self.PlayerRemoved = Signal.new ()
 

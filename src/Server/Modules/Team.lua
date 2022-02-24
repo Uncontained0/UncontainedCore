@@ -16,7 +16,7 @@ game.Players.PlayerRemoving:Connect(function(Player)
 	end
 end)
 
-function Team.new (Name:string,Color:Color3): CustomTeam
+function Team.new (Name:string,Color:Color3,LayoutOrder:number): CustomTeam
 	if Team._Teams[Name] then return Team._Teams[Name] end
 
 	local self = {}
@@ -32,12 +32,19 @@ function Team.new (Name:string,Color:Color3): CustomTeam
 			Utility.Create("Color3Value",{
 				Name = "Color",
 				Value = Color,
+			}),
+			Utility.Create("IntValue",{
+				Name = "LayoutOrder",
+				Value = LayoutOrder,
 			})
 		}),
 		Utility.Create("Folder",{
 			Name = "Players",
 		})
 	})
+
+	self.Color = Color
+	self.LayoutOrder = LayoutOrder
 
 	self.PlayerAdded = Signal.new ()
 	self.PlayerRemoved = Signal.new ()
