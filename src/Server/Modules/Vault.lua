@@ -36,29 +36,34 @@ game:BindToClose(function()
 	end
 end)
 
-Event.new("LocalVault"):SetCallback(function(Player:Player,Key:string)
-	return Vault.Player.new (Player):Get (Key)
+local Sync = Event.new("VaultSync")
+local Update = Event.new("VaultUpdate")
+
+Sync:SetCallback(function(Player)
+	return Vault.Player.new(Player)._Data
 end)
 
 function Vault.Player.new (Player:Player|number): VaultPlayer
+	local UserId
 	if type(Player) ~= "number" then
-		Player = Player.UserId
+		UserId = Player.UserId
 	end
 
-	if Vault.Player._Cache[Player] ~= nil then return Vault.Player._Cache[Player] end
+	if Vault.Player._Cache[UserId] ~= nil then return Vault.Player._Cache[UserId] end
 
 	local self = {}
 	setmetatable(self,{__index=Vault.Player})
 
 	self._Temp = {}
-	self.UserId = Player
+	self.UserId = UserId
 	self.KeySignals = {}
+	self.Player = if type(Player) ~= "number" then Player else nil
 
-	local Success,Value = pcall(PlayerDataStore.GetAsync,PlayerDataStore,Player)
+	local Success,Value = pcall(PlayerDataStore.GetAsync,PlayerDataStore,UserId)
 	local RetryNum = 0
 	while not Success and RetryNum < Vault.MaxRetries do
 		RetryNum += 1
-		Success,Value = pcall(PlayerDataStore.SetAsync,PlayerDataStore,Player)
+		Success,Value = pcall(PlayerDataStore.SetAsync,PlayerDataStore,UserId)
 	end
 	if Success then
 		self._Data = Value
@@ -68,7 +73,7 @@ function Vault.Player.new (Player:Player|number): VaultPlayer
 		self._Save = false
 	end
 
-	Vault.Player._Cache[Player] = self
+	Vault.Player._Cache[UserId] = self
 
 	return self
 end
@@ -90,7 +95,8 @@ function Vault.Player:Get (Key:string,DefaultValue:any?): any
 end
 
 function Vault.Player:Set (Key:string,Value:any)
-	if self.KeySignals[Key] then self.KeySignals[Key]:Fire (Value) end
+	if self.KeySignals[Key] then self.KeySignals[Key]:Fire () end
+	if self.Player then Update:FireClient (self.Player,Key,Value) end
 	self._Data[Key] = Value
 end
 
@@ -106,12 +112,12 @@ end
 function Vault.Player:CombineTemp (TempHasPriority:boolean?)
 	if TempHasPriority then
 		for i,v in pairs(self._Temp) do
-			self._Data[i] = v
+			self:Set(i,v)
 		end
 	else
 		for i,v in pairs(self._Temp) do
 			if self._Data[i] ~= nil then continue end
-			self._Data[i] = v
+			self:Set(i,v)
 		end
 	end
 end
