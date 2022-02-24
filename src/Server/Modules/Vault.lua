@@ -41,6 +41,7 @@ local Update = Event.new("VaultUpdate")
 
 Sync:SetCallback(function(Player)
 	return Vault.Player.new(Player)._Data
+	print("a")
 end)
 
 function Vault.Player.new (Player:Player|number): VaultPlayer
