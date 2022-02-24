@@ -11,7 +11,7 @@ local CharacterFolder = Utility.Create("Folder",{
 	Parent = game.Workspace,
 })
 
-local RagdollFolder = Utility.Create("Folder",{
+Utility.Create("Folder",{
 	Name = "Ragdolls",
 	Parent = game.Workspace,
 })

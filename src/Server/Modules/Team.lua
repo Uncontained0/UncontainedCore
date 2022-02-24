@@ -11,7 +11,9 @@ Team._Teams = {}
 
 game.Players.PlayerRemoving:Connect(function(Player)
 	local PastTeam = Team.fromPlayer(Player)
-	if PastTeam then PastTeam:RemovePlayer(Player) end
+	if PastTeam then
+		PastTeam:RemovePlayer(Player)
+	end
 end)
 
 function Team.new (Name:string,Color:Color3): CustomTeam
@@ -63,7 +65,9 @@ end
 
 function Team:AddPlayer (Player:Player)
 	local PastTeam = Team.fromPlayer(Player)
-	if PastTeam then PastTeam:RemovePlayer(Player) end
+	if PastTeam then 
+		PastTeam:RemovePlayer(Player)
+	end
 	Utility.Create("ObjectValue",{
 		Name = Player.Name,
 		Value = Player,

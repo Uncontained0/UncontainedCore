@@ -36,7 +36,9 @@ function Event.new (Name:string): Event
 			end
 		elseif RequestType == "Call" then
 			if type(Data.RequestId) ~= "string" then return end
-			if self.Requests[Player] == nil then self.Requests[Player] = {} end
+			if self.Requests[Player] == nil then 
+				self.Requests[Player] = {} 
+			end
 			if self.Requests[Player][Data.RequestId] == true then return end
 			self.Requests[Player][Data.RequestId] = true
 			if self.Callback then
@@ -49,7 +51,9 @@ function Event.new (Name:string): Event
 			end
 		elseif RequestType == "CallResponse" then
 			if type(Data.RequestId) ~= "string" then return end
-			if self.Requests[Player] == nil then self.Requests[Player] = {} end
+			if self.Requests[Player] == nil then 
+				self.Requests[Player] = {} 
+			end
 			if self.Requests[Player][Data.RequestId] == nil then return end
 			self.Requests[Player][Data.RequestId]:Resolve(unpack(Data.Arguments))
 			self.Request[Player][Data.RequestId] = nil
@@ -95,26 +99,28 @@ function Event:Wait (MaxTime:number?)
 	local Running = coroutine.running ()
 	local n = #self.Yielding+1
 	self.Yielding[n] = Running
-	local Task = Task.new (MaxTime,Running)
+	local WaitTask = Task.new (MaxTime,Running)
 	coroutine.yield ()
-	Task:Cancel ()
+	WaitTask:Cancel ()
 	return unpack(Data)
 end
 
 function Event:Once (Function: (Player:Player,...any) -> boolean): Connection
-	local Connection
-	Connection = Connection.new(self,function(...)
+	local OnceConnection
+	OnceConnection = Connection.new(self,function(...)
 		local Success = Function (...)
-		if Success then Connection:Disconnect() end
+		if Success then 
+			OnceConnection:Disconnect() 
+		end
 	end)
-	return Connection
+	return OnceConnection
 end
 
-function Connection.new (Event:Event,Function:(Player:Player,...any)->(...any)): Connection
+function Connection.new (ConnectionEvent:Event,Function:(Player:Player,...any)->(...any)): Connection
 	local self = {}
 	setmetatable(self,{__index=Connection})
 
-	self.Event = Event
+	self.Event = ConnectionEvent
 	self.Function = Function
 	self.Id = #Event.Connections+1
 

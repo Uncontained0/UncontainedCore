@@ -6,14 +6,11 @@ local Task = require(game.ReplicatedStorage.Utility.TaskScheduler)
 local Signal = require(game.ReplicatedStorage.Utility.Signal)
 
 local PlayerDataStore: DataStore
-local GlobalDataStore: DataStore
 
 if game:GetService("RunService"):IsStudio() then
 	PlayerDataStore = DataStoreService:GetDataStore("StudioPlayerDataStore")
-	GlobalDataStore = DataStoreService:GetDataStore("StudioGlobalDataStore")
 else
 	PlayerDataStore = DataStoreService:GetDataStore("PlayerDataStore")
-	GlobalDataStore = DataStoreService:GetDataStore("GlobalDataStore")
 end
 
 local Vault = {}
@@ -90,18 +87,26 @@ function Vault.Player:Save (): boolean
 end
 
 function Vault.Player:Get (Key:string,DefaultValue:any?): any
-	if self._Data[Key] == nil then self._Data[Key] = DefaultValue end
+	if self._Data[Key] == nil then
+		self._Data[Key] = DefaultValue
+	end
 	return self._Data[Key]
 end
 
 function Vault.Player:Set (Key:string,Value:any)
-	if self.KeySignals[Key] then self.KeySignals[Key]:Fire () end
-	if self.Player then Update:FireClient (self.Player,Key,Value) end
+	if self.KeySignals[Key] then
+		self.KeySignals[Key]:Fire ()
+	end
+	if self.Player then
+		Update:FireClient (self.Player,Key,Value)
+	end
 	self._Data[Key] = Value
 end
 
 function Vault.Player:GetTemp (Key:string,DefaultValue:any?)
-	if self._Temp[Key] == nil then self._Temp[Key] = DefaultValue end
+	if self._Temp[Key] == nil then
+		self._Temp[Key] = DefaultValue
+	end
 	return self._Temp[Key]
 end
 
@@ -176,7 +181,7 @@ function Vault.Firebase:Get (Path:string): any?
 end
 
 function Vault.Firebase:Set (Path:string,Value:any): boolean
-	local Success,Response = pcall(HttpService.RequestAsync,HttpService,{
+	local Success = pcall(HttpService.RequestAsync,HttpService,{
 		Url = self.URL..Path..".json?auth="..self.Token,
 		Body = HttpService:JSONEncode(Value),
 		Method = "PUT",
@@ -184,7 +189,7 @@ function Vault.Firebase:Set (Path:string,Value:any): boolean
 	local RetryCount = 0
 	while not Success and RetryCount < 10 do
 		RetryCount += 1
-		Success,Response = pcall(HttpService.RequestAsync,HttpService,{
+		Success = pcall(HttpService.RequestAsync,HttpService,{
 			Url = self.URL..Path..".json?auth="..self.Token,
 			Body = HttpService:JSONEncode(Value),
 			Method = "PUT",
@@ -200,14 +205,14 @@ function Vault.Firebase:Set (Path:string,Value:any): boolean
 end
 
 function Vault.Firebase:Delete (Path:string): boolean
-	local Success,Response = pcall(HttpService.RequestAsync,HttpService,{
+	local Success = pcall(HttpService.RequestAsync,HttpService,{
 		Url = self.URL..Path..".json?auth="..self.Token,
 		Method = "DELETE",
 	})
 	local RetryCount = 0
 	while not Success and RetryCount < 10 do
 		RetryCount += 1
-		Success,Response = pcall(HttpService.RequestAsync,HttpService,{
+		Success = pcall(HttpService.RequestAsync,HttpService,{
 			Url = self.URL..Path..".json?auth="..self.Token,
 			Method = "DELETE",
 		})

@@ -14,7 +14,9 @@ local LeaderstatFolder = Utility.Create("Folder",{
 local Leaderboard = {}
 
 game.Players.PlayerRemoving:Connect(function(Player:Player)
-	if Leaderboard.Player._Cache[Player] ~= nil then Leaderboard.Players._Cache[Player]:Destroy () end
+	if Leaderboard.Player._Cache[Player] ~= nil then 
+		Leaderboard.Players._Cache[Player]:Destroy ()
+	end
 end)
 
 Leaderboard.Leaderstat = {}

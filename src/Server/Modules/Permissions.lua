@@ -42,6 +42,9 @@ function Permissions.Player.new (Player:Player): PlayerPermissions
 end
 
 function Permissions.Player:AssignGroup (Group:PermissionGroup)
+    if type(Group) == "string" then 
+        Group = if Permissions.Group._Cache[Group] then Permissions.Group._Cache[Group] else nil 
+    end
     self.PermissionGroup = Group
 end
 
@@ -64,7 +67,7 @@ function Permissions.Player:HasPermission (Permission:string): boolean
 end
 
 Event.new("LocalPermissions"):SetCallback(function(Player:Player,Permission:string)
-    return Permissions.Player:HasPermission(Permission)
+    return Permissions.Player.new(Player):HasPermission(Permission)
 end)
 
 export type PermissionGroup = typeof(Permissions.PermissionGroup.new())
