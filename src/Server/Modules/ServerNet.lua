@@ -34,6 +34,9 @@ function Event.new (Name:string): Event
 			for _,v in pairs(self.Connections) do
 				task.spawn(v.Function,Player,unpack(Data.Arguments))
 			end
+			for _,v in pairs(self.Yielding) do
+				coroutine.resume(v)
+			end
 		elseif RequestType == "Call" then
 			if type(Data.RequestId) ~= "string" then return end
 			if self.Requests[Player] == nil then 
@@ -95,13 +98,13 @@ end
 
 function Event:Wait (MaxTime:number?)
 	MaxTime = if MaxTime then MaxTime else math.huge
-	local Data
 	local Running = coroutine.running ()
 	local n = #self.Yielding+1
 	self.Yielding[n] = Running
 	local WaitTask = Task.new (MaxTime,Running)
-	coroutine.yield ()
+	local Data = coroutine.yield ()
 	WaitTask:Cancel ()
+	table.remove(self.Yielding,n)
 	return unpack(Data)
 end
 
@@ -124,7 +127,7 @@ function Connection.new (ConnectionEvent:Event,Function:(Player:Player,...any)->
 	self.Function = Function
 	self.Id = #Event.Connections+1
 
-	Event.Connections[self.Id] = self
+	ConnectionEvent.Connections[self.Id] = self
 	return self
 end
 

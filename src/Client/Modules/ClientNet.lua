@@ -17,6 +17,7 @@ function Event.new (Name:string): Event
 	self.Event = Network[Name]
 	self.Requests = {}
 	self.Connections = {}
+	self.Yielding = {}
 	
 	EventList[Name] = self
 	
@@ -25,8 +26,13 @@ function Event.new (Name:string): Event
 			for _,v in pairs(self.Connections) do
 				task.spawn(v.Function,unpack(Data.Arguments))
 			end
+			for _,v in pairs(self.Yielding) do
+				coroutine.resume(v,Data)
+			end
 		elseif RequestType == "Call" then
-			if self.Requests[Data.RequestId] ~= nil then error("FATAL ERROR: SERVER SENT USED REQUESTID!") end
+			if self.Requests[Data.RequestId] ~= nil then
+				error("FATAL ERROR: SERVER SENT USED REQUESTID!")
+			end
 			self.Requests[Data.RequestId] = true
 			if self.Callback then
 				local Value = table.pack(self.Callback (unpack(Data.Arguments)))
@@ -70,36 +76,36 @@ end
 
 function Event:Wait (MaxTime:number?)
 	MaxTime = if MaxTime then MaxTime else math.huge
-	local Data
 	local Running = coroutine.running ()
-	local Connection
-	Connection = self:Connect (function(...) Connection:Disconnect () Data = {...} coroutine.resume(Running) end)
-	local Task = Task.new (MaxTime,function () 
-		coroutine.resume(Running)
-	end)
-	coroutine.yield ()
-	Task:Cancel ()
+	local n = #self.Yielding+1
+	self.Yielding[n] = Running
+	local WaitTask = Task.new (MaxTime,Running)
+	local Data = coroutine.yield ()
+	WaitTask:Cancel ()
+	table.remove(self.Yielding,n)
 	return unpack(Data)
 end
 
 function Event:Once (Function: (Player:Player,...any) -> boolean): Connection
-	local Connection
-	Connection = Connection.new(self,function(...)
+	local OnceConnection
+	OnceConnection = Connection.new(self,function(...)
 		local Success = Function (...)
-		if Success then Connection:Disconnect() end
+		if Success then
+			OnceConnection:Disconnect()
+		end
 	end)
-	return Connection
+	return OnceConnection
 end
 
-function Connection.new (Event:Event,Function:(Player:Player,...any)->(...any)): Connection
+function Connection.new (ConnectionEvent:Event,Function:(Player:Player,...any)->(...any)): Connection
 	local self = {}
 	setmetatable(self,{__index=Connection})
 
-	self.Event = Event
+	self.Event = ConnectionEvent
 	self.Function = Function
 	self.Id = #Event.Connections+1
 
-	Event.Connections[self.Id] = self
+	ConnectionEvent.Connections[self.Id] = self
 	return self
 end
 
