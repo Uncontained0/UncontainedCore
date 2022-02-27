@@ -29,6 +29,7 @@ end
 local Gui = Instance.new("ScreenGui")
 Gui.IgnoreGuiInset = true
 Gui.ResetOnSpawn = false
+Gui.DisplayOrder = 999
 Gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local Background = Instance.new("Frame")
 Background.BackgroundColor3 = Color3.new(0.2,0.2,0.2)
