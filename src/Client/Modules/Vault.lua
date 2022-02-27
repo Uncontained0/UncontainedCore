@@ -6,7 +6,17 @@ Vault._Data = {}
 Vault.KeySignals = {}
 
 function Vault:Get (Key:string): any?
-    return self._Data[Key]
+    local KeyPath = Key:split("/")
+	local Data = self._Data
+	for i,v in ipairs(KeyPath) do
+		if i == #KeyPath then
+			return Data[v]
+		end
+		if Data[v] == nil then
+			Data[v] = {}
+		end
+		Data = Data[v]
+	end
 end
 
 function Vault:GetKeyChangedSignal (Key:string): Signal
@@ -16,7 +26,17 @@ function Vault:GetKeyChangedSignal (Key:string): Signal
 end
 
 Event.new("VaultUpdate"):Connect(function(Key,Value)
-    Vault._Data[Key] = Value
+    local KeyPath = Key:split("/")
+	local Data = Vault._Data
+	for i,v in ipairs(KeyPath) do
+		if i == #KeyPath then
+			Data[v] = Value
+		end
+		if Data[v] == nil then
+			Data[v] = {}
+		end
+		Data = Data[v]
+	end
     if Vault.KeySignals[Key] then
         Vault.KeySignals[Key]:Fire ()
     end

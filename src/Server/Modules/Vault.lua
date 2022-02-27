@@ -110,7 +110,17 @@ function Vault.Player:Set (Key:string,Value:any)
 	if self.Player then
 		Update:FireClient (self.Player,Key,Value)
 	end
-	self._Data[Key] = Value
+	local KeyPath = Key:split("/")
+	local Data = self._Data
+	for i,v in ipairs(KeyPath) do
+		if i == #KeyPath then
+			Data[v] = Value
+		end
+		if Data[v] == nil then
+			Data[v] = {}
+		end
+		Data = Data[v]
+	end
 end
 
 function Vault.Player:GetTemp (Key:string,DefaultValue:any?)
