@@ -2,7 +2,7 @@ local TweenService = game:GetService("TweenService")
 
 local Module = {}
 
-function Module.Create (ClassName:string,Properties:{[string]:any?}?,Children:{instance}?): any
+function Module.Create (ClassName:string,Properties:{[string]:any?}?,Children:{Instance}?): Instnace
 	local Object = Instance.new(ClassName)
 	local InitFunction
 	if type(Properties) == "table" then
