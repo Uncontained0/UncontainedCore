@@ -87,10 +87,20 @@ function Vault.Player:Save (): boolean
 end
 
 function Vault.Player:Get (Key:string,DefaultValue:any?): any
-	if self._Data[Key] == nil then
-		self._Data[Key] = DefaultValue
+	local KeyPath = Key:split("/")
+	local Data = self._Data
+	for i,v in ipairs(KeyPath) do
+		if i == #KeyPath then
+			if Data[v] == nil then
+				Data[v] = DefaultValue
+			end
+			return Data[v]
+		end
+		if Data[v] == nil then
+			Data[v] = {}
+		end
+		Data = Data[v]
 	end
-	return self._Data[Key]
 end
 
 function Vault.Player:Set (Key:string,Value:any)
