@@ -1,23 +1,26 @@
-local LocalizationService = game:GetService("LocalizationService")
-
 local TweenService = game:GetService("TweenService")
 
 local Module = {}
 
-function Module.Create (ClassName:string,Properties:table?,Children:table?): any
+function Module.Create (ClassName:string,Properties:{[string]:any?}?,Children:{instance}?): any
 	local Object = Instance.new(ClassName)
 	local InitFunction
 	if type(Properties) == "table" then
 		for i,v in pairs(Properties) do
 			if type(v) == "function" then
-				if i == "Init" then InitFunction = v continue end
+				if i == "Init" then 
+					InitFunction = v 
+					continue 
+				end
 				Object[i]:Connect(v)
 			else
 				Object[i] = v
 			end
 		end
 	end
-	if InitFunction then InitFunction (Object) end
+	if InitFunction then 
+		InitFunction (Object) 
+	end
 	if type(Children) == "table" then
 		for _,v in pairs(Children) do
 			v.Parent = Object
@@ -60,7 +63,11 @@ function Module.SimplifyNumber (Value:number): string
 	local rn = 1
 	local index = 0
 	for i=#Values,-1,1 do
-		if Value > Values[i][1] then rn = Values[i][1] index = i break end
+		if Value > Values[i][1] then 
+			rn = Values[i][1] 
+			index = i 
+			break 
+		end
 	end
 	Value = Value/rn
 	if index == 0 then return tostring(Value) end
