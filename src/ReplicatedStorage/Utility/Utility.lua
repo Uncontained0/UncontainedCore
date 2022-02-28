@@ -4,26 +4,32 @@ local Module = {}
 
 function Module.Create (ClassName:string,Properties:{[string]:any?}?,Children:{Instance}?): Instance
 	local Object = Instance.new(ClassName)
-	local InitFunction
 	if type(Properties) == "table" then
 		for i,v in pairs(Properties) do
 			if type(v) == "function" then
-				if i == "Init" then 
-					InitFunction = v 
-					continue 
-				end
 				Object[i]:Connect(v)
 			else
 				Object[i] = v
 			end
 		end
 	end
-	if InitFunction then 
-		InitFunction (Object) 
-	end
 	if type(Children) == "table" then
 		for _,v in pairs(Children) do
 			v.Parent = Object
+		end
+	end
+	return Object
+end
+
+function Module.Clone (Object:Instance,Properties:{[string]:any?}?): Instance
+	Object = Object:Clone ()
+	if type(Properties) == "table" then
+		for i,v in pairs(Properties) do
+			if type(v) == "function" then
+				Object[i]:Connect(v)
+			else
+				Object[i] = v
+			end
 		end
 	end
 	return Object
@@ -85,7 +91,7 @@ end
 
 function Module.RandomString (Length:number): string
 	local Str = ""
-	for i=0,Length,1 do
+	for _=0,Length,1 do
 		Str = Str..string.char(Chars[math.random(1,#Chars)])
 	end
 	return Str
