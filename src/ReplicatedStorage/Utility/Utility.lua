@@ -21,7 +21,7 @@ function Module.Create (ClassName:string,Properties:{[string]:any?}?,Children:{I
 	return Object
 end
 
-function Module.Clone (Object:Instance,Properties:{[string]:any?}?): Instance
+function Module.Clone (Object:Instance,Properties:{[string]:any?}?,Children:{Instance}?): Instance
 	Object = Object:Clone ()
 	if type(Properties) == "table" then
 		for i,v in pairs(Properties) do
@@ -30,6 +30,11 @@ function Module.Clone (Object:Instance,Properties:{[string]:any?}?): Instance
 			else
 				Object[i] = v
 			end
+		end
+	end
+	if type(Children) == "table" then
+		for _,v in pairs(Children) do
+			v.Parent = Object
 		end
 	end
 	return Object
