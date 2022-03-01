@@ -39,10 +39,12 @@ function Signal:Wait (MaxTime:number?): (...any)
 end
 
 function Signal:Once (Function: (...any)->boolean): Connection
-	local Connection
-	Connection = Connection.new(self,function(...)
+	local OnceConnection
+	OnceConnection = Connection.new(self,function(...)
 		local Success = Function (...)
-		if Success then Connection:Disconnect() end
+		if Success then
+			OnceConnection:Disconnect()
+		end
 	end)
 	return Connection
 end

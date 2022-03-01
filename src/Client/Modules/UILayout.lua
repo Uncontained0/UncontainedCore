@@ -57,12 +57,14 @@ function UILayout.VerticalList:_Start ()
 	for _,v:GuiObject in pairs(self._Gui:GetChildren()) do
 		if not v:IsA("GuiObject") then continue end
 		if v.Visible == false then continue end
-		if List[v.LayoutOrder] == nil then List[v.LayoutOrder] = {} end
+		if List[v.LayoutOrder] == nil then
+			List[v.LayoutOrder] = {}
+		end
 		List[v.LayoutOrder][#List[v.LayoutOrder]+1] = v
 	end
 
-	for _,v in pairs(List) do
-		for _,v:GuiObject in pairs(v) do
+	for _,vv in pairs(List) do
+		for _,v:GuiObject in pairs(vv) do
 			v.AnchorPoint = AnchorPoint
 			v.Position = Position
 			Position = UDim2.new(Position.X,Position.Y + v.Size.Y + self.Padding)
@@ -87,12 +89,14 @@ function UILayout.VerticalList:_Update ()
 
 	for _,v:GuiObject in pairs(self._Gui:GetChildren()) do
 		if not v:IsA("GuiObject") then continue end
-		if List[v.LayoutOrder] == nil then List[v.LayoutOrder] = {} end
+		if List[v.LayoutOrder] == nil then
+			List[v.LayoutOrder] = {}
+		end
 		List[v.LayoutOrder][#List[v.LayoutOrder]+1] = v
 	end
 
-	for _,v in pairs(List) do
-		for _,v:GuiObject in pairs(v) do
+	for _,vv in pairs(List) do
+		for _,v:GuiObject in pairs(vv) do
 			v.AnchorPoint = AnchorPoint
 			v:TweenPosition(Position,self.TweenDirection,self.TweenStyle,self.TweenTime,true)
 			Position = UDim2.new(Position.X,Position.Y + v.Size.Y + self.Padding)
@@ -152,7 +156,9 @@ function UILayout.LeftGrid:_Start ()
 	for _,v:GuiObject in pairs(self._Gui:GetChildren()) do
 		if not v:IsA("GuiObject") then continue end
 		if v.Visible == false then continue end
-		if List[v.LayoutOrder] == nil then List[v.LayoutOrder] = {} end
+		if List[v.LayoutOrder] == nil then
+			List[v.LayoutOrder] = {}
+		end
 		List[v.LayoutOrder][#List[v.LayoutOrder]+1] = v
 	end
 
@@ -160,8 +166,8 @@ function UILayout.LeftGrid:_Start ()
 	local CellSizePx = Utility.UDim2ToPx(self.CellSize,self._Gui)
 	local RowCellCount = 0
 
-	for _,v in pairs(List) do
-		for _,v:GuiObject in pairs(v) do
+	for _,vv in pairs(List) do
+		for _,v:GuiObject in pairs(vv) do
 			local Location = Utility.UDim2ToPx(Position,self._Gui)
 			if RowCellCount > self.HorizontalMaxCells or Location + CellSizePx > self._Gui.AbsoluteSize.X then
 				RowCellCount = 0
@@ -182,7 +188,9 @@ function UILayout.LeftGrid:_Update ()
 	for _,v:GuiObject in pairs(self._Gui:GetChildren()) do
 		if not v:IsA("GuiObject") then continue end
 		if v.Visible == false then continue end
-		if List[v.LayoutOrder] == nil then List[v.LayoutOrder] = {} end
+		if List[v.LayoutOrder] == nil then
+			List[v.LayoutOrder] = {}
+		end
 		List[v.LayoutOrder][#List[v.LayoutOrder]+1] = v
 	end
 
